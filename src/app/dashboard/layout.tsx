@@ -1,16 +1,13 @@
-import React from "react";
+import Sidebar from "@/components/Sidebar";
 
-export default function ProductsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-4">Product Management</h1>
-      <div className="bg-white rounded-xl shadow p-5">
+    <div className="flex min-h-screen bg-[#0f172a] text-white">
+      <Sidebar />
+
+      <main className="flex-1 p-6">
         {children}
-      </div>
+      </main>
     </div>
   );
 }
