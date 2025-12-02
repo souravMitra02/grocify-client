@@ -1,68 +1,110 @@
 "use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { loginSuccess } from "@/redux/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
-
+import { loginSuccess } from "@/redux/authSlice";
 
 interface LoginForm {
   email: string;
   password: string;
 }
 
-const demoCredentials: LoginForm = {
-  email: "admin@demo.com",
-  password: "123456"
-};
-
 export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
-  const dispatch = useAppDispatch();
   const router = useRouter();
-  const [loginError, setLoginError] = useState<string>("");
+  const dispatch = useAppDispatch();
 
-  const onSubmit: SubmitHandler<LoginForm> = (data) => {
-    if (data.email === demoCredentials.email && data.password === demoCredentials.password) {
+  const [loginError, setLoginError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (data: LoginForm) => {
+    setLoginError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setLoginError(result?.message || "Couldn't log in. Please check your credentials.");
+        return;
+      }
+
       dispatch(loginSuccess(data.email));
-      document.cookie = "jwt=demoToken123; path=/; max-age=3600";
+
       router.push("/dashboard/products");
-    } else {
-      setLoginError("Invalid credentials. Please try again.");
+
+    } catch (err) {
+      console.error("Login error:", err);
+      setLoginError("Network error. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center  px-4">
-      <div className="max-w-md w-full bg-gray-200 p-8 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-white text-center mb-2">Grocify</h1>
-        <p className="text-gray-300 text-center mb-6">Welcome back! Please login.</p>
+    <div className="bg-[#0f172a] min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-[#1e293b] p-8 rounded-lg shadow">
+        
+        <h1 className="text-3xl font-semibold text-white text-center mb-1">
+          Grocify
+        </h1>
 
-        {loginError && <p className="text-red-400 text-center mb-4">{loginError}</p>}
+        <p className="text-gray-400 text-center mb-6">
+          Welcome back — sign in to continue
+        </p>
+
+        {loginError && (
+          <p className="text-red-400 text-center mb-4 text-sm">
+            {loginError}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          
           <Input
-           
-            placeholder="admin@demo.com"
+            placeholder="Email"
             {...register("email", { required: "Email is required" })}
           />
-          {errors.email && <p className="text-red-400 text-sm">{errors.email.message}</p>}
+          {errors.email && (
+            <span className="text-red-400 text-xs">
+              {errors.email.message}
+            </span>
+          )}
 
           <Input
-          
             type="password"
-            placeholder="123456"
+            placeholder="Password"
             {...register("password", { required: "Password is required" })}
           />
-          {errors.password && <p className="text-red-400 text-sm">{errors.password.message}</p>}
+          {errors.password && (
+            <span className="text-red-400 text-xs">
+              {errors.password.message}
+            </span>
+          )}
 
-          <Button type="submit" className="w-full mt-4">Login</Button>
+          <Button
+            type="submit"
+            className="w-full mt-3"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </Button>
         </form>
 
-        <p className="text-gray-400 text-sm mt-4 text-center">
+        <p className="text-gray-400 text-xs text-center mt-4">
           Demo credentials: admin@demo.com / 123456
         </p>
       </div>
