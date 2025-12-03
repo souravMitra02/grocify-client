@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { db, collection, onSnapshot } from "@/lib/firebase";
 import ChartCard from "@/components/ChartCard";
 
@@ -9,23 +10,66 @@ import {
   BarChart, Bar, XAxis, YAxis,
   Tooltip, ResponsiveContainer
 } from "recharts";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AnalyticsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/check", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          router.push("/login");
+          return;
+        }
+
+        const data = await res.json();
+        if (!data.authenticated) {
+          router.push("/login");
+        } else {
+          setAuthChecked(true);
+        }
+      } catch (err) {
+        console.error(err);
+        router.push("/login");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  useEffect(() => {
+    if (!authChecked) return;
+
     const unsubscribe = onSnapshot(collection(db, "products"), snapshot => {
       setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
     });
-    return () => unsubscribe();
-  }, []);
 
+    return () => unsubscribe();
+  }, [authChecked]);
+
+  if (!authChecked || loading) {
+    return (
+       <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+      <Spinner className="size-16 text-blue-500" />
+      </div>
+    );
+  }
 
   const totalProducts = products.length;
 
   const statusData = [
-    { name: "Active", value: products.filter(p => p.status === "Active").length },
-    { name: "Inactive", value: products.filter(p => p.status !== "Active").length },
+    { name: "Active", value: products.filter(p => p.status === "active").length },
+    { name: "Inactive", value: products.filter(p => p.status !== "active").length },
   ];
 
   const COLORS = ["#22c55e", "#ef4444"];
@@ -41,18 +85,17 @@ export default function AnalyticsPage() {
   }));
 
   return (
-    <div className="p-6 space-y-8">
-
+    <div className="p-6 space-y-8 min-h-screen bg-gray-50">
       <h1 className="text-3xl font-bold text-green-400 tracking-wide">
         Grocery Products Analytics
       </h1>
 
       <div className="grid md:grid-cols-2 gap-6">
-        
         <ChartCard title="Total Products">
           <p className="text-4xl font-semibold text-white">{totalProducts}</p>
           <p className="text-gray-400 mt-1 text-sm">All grocery items in the database</p>
         </ChartCard>
+
         <ChartCard title="Active vs Inactive Products">
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
@@ -71,7 +114,6 @@ export default function AnalyticsPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        {/* Products by Category */}
         <ChartCard title="Products by Category">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={categoryData}>
@@ -82,7 +124,6 @@ export default function AnalyticsPage() {
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
-
       </div>
     </div>
   );

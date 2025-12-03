@@ -55,14 +55,8 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
   };
 
   const columns: ColumnDef<Product>[] = [
-    {
-      header: "Category",
-      accessorKey: "category",
-    },
-    {
-      header: "Name",
-      accessorKey: "name",
-    },
+    { header: "Category", accessorKey: "category" },
+    { header: "Name", accessorKey: "name" },
     {
       header: "Price",
       accessorKey: "price",
@@ -73,10 +67,10 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
       accessorKey: "status",
       cell: ({ row }) => (
         <span
-          className={`px-2 py-1 rounded text-sm font-medium shadow-sm ${
+          className={`px-2 py-1 rounded-full text-xs font-medium shadow-sm ${
             row.original.status === "active"
               ? "bg-green-600 text-white"
-              : "bg-gray-400 text-black"
+              : "bg-gray-300 text-black"
           }`}
         >
           {row.original.status}
@@ -86,34 +80,32 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
     {
       header: "Actions",
       cell: ({ row }) => (
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-wrap gap-2 items-center">
           {/* Edit */}
           <button
             onClick={() => onEdit(row.original)}
-            className="flex items-center gap-1 p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition shadow"
+            className="flex items-center gap-1 p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/40 shadow text-blue-700 text-sm"
           >
-            <Pencil size={18} className="text-blue-600" />
-            <span className="text-blue-700 text-sm">Edit</span>
+            <Pencil size={16} /> Edit
           </button>
+          {/* Toggle Status */}
           <button
             onClick={() => handleStatus(row.original)}
-            className="flex items-center gap-1 p-2 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 transition shadow"
+            className="flex items-center gap-1 p-2 rounded-lg bg-yellow-400/20 hover:bg-yellow-400/40 shadow text-yellow-800 text-sm"
           >
             {row.original.status === "active" ? (
-              <ToggleRight size={22} className="text-yellow-600" />
+              <ToggleRight size={18} />
             ) : (
-              <ToggleLeft size={22} className="text-gray-600" />
+              <ToggleLeft size={18} />
             )}
-            <span className="text-yellow-700 text-sm">
-              {row.original.status === "active" ? "Active" : "Inactive"}
-            </span>
+            {row.original.status === "active" ? "Active" : "Inactive"}
           </button>
+          {/* Delete */}
           <button
             onClick={() => handleDelete(row.original.id)}
-            className="flex items-center gap-1 p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition shadow"
+            className="flex items-center gap-1 p-2 rounded-lg bg-red-500/20 hover:bg-red-500/40 shadow text-red-700 text-sm"
           >
-            <Trash2 size={18} className="text-red-600" />
-            <span className="text-red-700 text-sm">Delete</span>
+            <Trash2 size={16} /> Delete
           </button>
         </div>
       ),
@@ -131,7 +123,7 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="rounded-xl border bg-gray-50 p-5 shadow-xl"
+      className="rounded-xl border bg-white shadow-lg p-5 w-full"
     >
       {loading ? (
         <div className="space-y-3">
@@ -140,48 +132,56 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
           ))}
         </div>
       ) : (
-        <table className="w-full text-left border-collapse">
-          <thead>
-            {table.getHeaderGroups().map((hg) => (
-              <tr key={hg.id} className="border-b bg-gray-100">
-                {hg.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className="py-3 px-3 font-semibold text-gray-700"
+        <div className="overflow-x-auto w-full">
+          <div className="min-w-[700px]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                {table.getHeaderGroups().map((hg) => (
+                  <tr key={hg.id} className="bg-green-600 text-white">
+                    {hg.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className="py-3 px-4 font-semibold text-left text-sm"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row, i) => (
+                  <motion.tr
+                    key={row.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: i * 0.05 }}
+                    className="border-b hover:bg-green-50 transition-all"
                   >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="py-3 px-4 text-sm">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </motion.tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-
-          <tbody>
-            {table.getRowModel().rows.map((row, i) => (
-              <motion.tr
-                key={row.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25, delay: i * 0.05 }}
-                className="border-b hover:bg-gray-100/60 transition"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="py-3 px-3">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </motion.tr>
-            ))}
-
-            {products.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center py-5 text-gray-500">
-                  No products found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                {products.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="text-center py-5 text-gray-400">
+                      No products found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </motion.div>
   );
