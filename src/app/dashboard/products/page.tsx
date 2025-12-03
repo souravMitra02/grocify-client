@@ -39,7 +39,7 @@ export default function ProductsPage() {
     await updateDoc(doc(db, "products", id), { status });
   };
 
-  const handleSave = async (product: any) => {
+  const handleSave = async (product:any) => {
     if (editProduct) {
       
       await updateDoc(doc(db, "products", editProduct.id), product);

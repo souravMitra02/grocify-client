@@ -14,7 +14,7 @@ export default function ProductModal({ product, onClose, onSave }: any) {
     },
   });
 
-  const submit = (data: any) => {
+  const submit = (data:any) => {
     onSave(data);
     reset();
   };

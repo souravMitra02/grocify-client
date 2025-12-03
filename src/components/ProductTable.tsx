@@ -95,8 +95,6 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
             <Pencil size={18} className="text-blue-600" />
             <span className="text-blue-700 text-sm">Edit</span>
           </button>
-
-          {/* Status Toggle */}
           <button
             onClick={() => handleStatus(row.original)}
             className="flex items-center gap-1 p-2 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 transition shadow"
@@ -110,8 +108,6 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
               {row.original.status === "active" ? "Active" : "Inactive"}
             </span>
           </button>
-
-          {/* Delete */}
           <button
             onClick={() => handleDelete(row.original.id)}
             className="flex items-center gap-1 p-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition shadow"

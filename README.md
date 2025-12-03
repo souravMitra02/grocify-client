@@ -26,7 +26,6 @@ This frontend allows real-time product management, including adding, editing, de
 
 ### UI Components
 - Sidebar with navigation.
-- Header/navbar (optional).
 - Reusable Product Table and Product Modal.
 - Dark/light theme support with Tailwind gradient backgrounds.
 
@@ -81,12 +80,12 @@ Add Firebase environment variables in .env.local:
 
 env
 Copy code
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAnxMsP_jtzzPOFjCkVtjL5DwWbDf_7AK8
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=grocify-productdashboard.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=grocify-productdashboard
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=grocify-productdashboard.firebasestorage.app
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=838444009982
-NEXT_PUBLIC_FIREBASE_APP_ID=1:838444009982:web:558fa63cc21faa63cc21faa5a6fd8af
+NEXT_PUBLIC_FIREBASE_API_KEY=yourKey
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=yourDomain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=yourProjectId
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=yourStorageBucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_ID=yourSenderId
+NEXT_PUBLIC_FIREBASE_APP_ID=yourAppId
 Running the Project
 bash
 Copy code
@@ -109,6 +108,8 @@ Name (required)
 Price (required)
 
 Category (required)
+
+Image (direct upload)
 
 Status (Active / Disabled)
 
