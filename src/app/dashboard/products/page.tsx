@@ -17,21 +17,20 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
 
-  // 🔹 Protect page: check JWT cookie with backend
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/check", {
+        const res = await fetch("https://grocify-server-zeta.vercel.app/api/auth/check", {
           method: "GET",
-          credentials: "include", // send cookies
+          credentials: "include",
         });
 
         const data = await res.json();
 
         if (!res.ok || !data.authenticated) {
-          router.push("/login"); // redirect to login if not authenticated
+          router.push("/login"); 
         } else {
-          setAuthChecked(true); // allow page render
+          setAuthChecked(true);
         }
       } catch (err) {
         console.error(err);
@@ -42,7 +41,6 @@ export default function ProductsPage() {
     checkAuth();
   }, [router]);
 
-  // 🔹 Firestore real-time products listener
   useEffect(() => {
     if (!authChecked) return;
 
@@ -91,8 +89,8 @@ export default function ProductsPage() {
 
   if (!authChecked || loading) {
     return (
-     <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-      <Spinner className="size-16 text-blue-500" />
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <Spinner className="size-16 text-blue-500" />
       </div>
     );
   }

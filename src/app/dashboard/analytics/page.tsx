@@ -21,7 +21,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/check", {
+        const res = await fetch("https://grocify-server-zeta.vercel.app/api/auth/check", {
           method: "GET",
           credentials: "include",
         });
@@ -59,8 +59,8 @@ export default function AnalyticsPage() {
 
   if (!authChecked || loading) {
     return (
-       <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-      <Spinner className="size-16 text-blue-500" />
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <Spinner className="size-16 text-blue-500" />
       </div>
     );
   }

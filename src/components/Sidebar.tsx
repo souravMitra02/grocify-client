@@ -14,7 +14,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:5000/api/auth/logout", {
+      await fetch("https://grocify-server-zeta.vercel.app/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
@@ -40,11 +40,10 @@ export default function Sidebar() {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`block px-4 py-2 rounded-xl transition-all ${
-                  path === item.path
+                className={`block px-4 py-2 rounded-xl transition-all ${path === item.path
                     ? "bg-green-500 text-white font-semibold shadow-md"
                     : "text-gray-200 hover:bg-[#1e293b]"
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>

@@ -7,52 +7,31 @@ import {
   ColumnDef,
 } from "@tanstack/react-table";
 
-import { useEffect, useState } from "react";
-import { Product } from "@/types";
-import { db } from "@/lib/firebase";
-import {
-  collection,
-  onSnapshot,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-
 import { motion } from "framer-motion";
 import { Pencil, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
+import { Product } from "@/types";
+import { useEffect, useState } from "react";
 
 interface ProductTableProps {
+  products: Product[];
   onEdit: (product: Product) => void;
+  onDelete: (id: string) => Promise<void>;
+  onChangeStatus: (product: Product) => Promise<void>;
 }
 
-export default function ProductTable({ onEdit }: ProductTableProps) {
-  const [products, setProducts] = useState<Product[]>([]);
+export default function ProductTable({
+  products,
+  onEdit,
+  onDelete,
+  onChangeStatus,
+}: ProductTableProps) {
   const [loading, setLoading] = useState(true);
 
+ 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "products"), (snapshot) => {
-      const list: Product[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Product),
-      }));
-      setProducts(list);
-      setLoading(false);
-    });
-
-    return () => unsub();
-  }, []);
-
-  const handleDelete = async (id: string) => {
-    await deleteDoc(doc(db, "products", id));
-  };
-
-  const handleStatus = async (product: Product) => {
-    await updateDoc(doc(db, "products", product.id), {
-      status: product.status === "active" ? "inactive" : "active",
-    });
-  };
+    setLoading(false);
+  }, [products]);
 
   const columns: ColumnDef<Product>[] = [
     { header: "Category", accessorKey: "category" },
@@ -81,16 +60,14 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-2 items-center">
-          {/* Edit */}
           <button
             onClick={() => onEdit(row.original)}
             className="flex items-center gap-1 p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/40 shadow text-blue-700 text-sm"
           >
             <Pencil size={16} /> Edit
           </button>
-          {/* Toggle Status */}
           <button
-            onClick={() => handleStatus(row.original)}
+            onClick={() => onChangeStatus(row.original)}
             className="flex items-center gap-1 p-2 rounded-lg bg-yellow-400/20 hover:bg-yellow-400/40 shadow text-yellow-800 text-sm"
           >
             {row.original.status === "active" ? (
@@ -100,9 +77,8 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
             )}
             {row.original.status === "active" ? "Active" : "Inactive"}
           </button>
-          {/* Delete */}
           <button
-            onClick={() => handleDelete(row.original.id)}
+            onClick={() => onDelete(row.original.id)}
             className="flex items-center gap-1 p-2 rounded-lg bg-red-500/20 hover:bg-red-500/40 shadow text-red-700 text-sm"
           >
             <Trash2 size={16} /> Delete
