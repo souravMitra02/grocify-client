@@ -1,16 +1,20 @@
 "use client";
 
-import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
-interface ChartCardProps {
+export default function ChartCard({
+  title,
+  children,
+}: {
   title: string;
-  children: ReactNode;
-}
-
-export default function ChartCard({ title, children }: ChartCardProps) {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="bg-[#1e293b] p-4 rounded-lg shadow-md">
-      <h2 className="text-white font-semibold mb-2">{title}</h2>
+    <div className={cn(
+      "bg-[#0f172a]/70 backdrop-blur-md border border-white/10",
+      "rounded-xl p-5 shadow-lg hover:shadow-xl transition-all"
+    )}>
+      <h2 className="text-lg font-semibold text-green-300 mb-3">{title}</h2>
       {children}
     </div>
   );

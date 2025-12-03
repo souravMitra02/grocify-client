@@ -1,36 +1,164 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Grocify Frontend
 
-## Getting Started
+## Project Overview
+Grocify is a modern grocery product management dashboard built with **Next.js 13 (App Router)**, **Firebase Firestore**, **Tailwind CSS**, and **ShadCN UI** components.  
+This frontend allows real-time product management, including adding, editing, deleting products, uploading images, and viewing analytics charts.
 
-First, run the development server:
+## Features
 
+### Authentication
+- Login with demo credentials.
+- JWT + cookies for secure login.
+
+### Product Management
+- View all products in a real-time table.
+- Add new products via a modal form.
+- Edit or delete existing products.
+- Change product status (Active / Disabled).
+- Direct image upload to Firebase Storage.
+- Form validation with React Hook Form.
+
+### Analytics
+- View total products.
+- Active vs Inactive products chart.
+- Products by category chart.
+- Fully responsive charts using ShadCN Charts.
+
+### UI Components
+- Sidebar with navigation.
+- Header/navbar (optional).
+- Reusable Product Table and Product Modal.
+- Dark/light theme support with Tailwind gradient backgrounds.
+
+## Demo Credentials
+Email: admin@demo.com
+Password: 123456
+
+shell
+Copy code
+
+## Project Structure
+frontend/
+├─ src/
+│ ├─ app/
+│ │ ├─ dashboard/
+│ │ │ ├─ layout.tsx # Sidebar + Header layout
+│ │ │ ├─ products/ # Product management page
+│ │ │ └─ analytics/ # Analytics charts page
+│ │ └─ login/ # Login page
+│ ├─ components/ # Reusable UI components
+│ │ ├─ Sidebar.tsx
+│ │ ├─ ProductTable.tsx
+│ │ ├─ ProductModal.tsx
+│ │ └─ ChartCard.tsx
+│ ├─ lib/
+│ │ └─ firebase.ts # Firebase config & initialization
+│ ├─ redux/ # Redux slices
+│ └─ types/
+│ └─ index.d.ts # TypeScript interfaces
+├─ public/ # Static assets
+├─ next.config.js # Next.js config
+├─ tailwind.config.js # Tailwind config
+└─ package.json
+
+bash
+Copy code
+
+## Installation
+
+Clone the repo:
 ```bash
+git clone https://github.com/souravMitra02/grocify-client
+cd frontend
+Install dependencies:
+
+bash
+Copy code
+npm install
+# or
+yarn
+Add Firebase environment variables in .env.local:
+
+env
+Copy code
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAnxMsP_jtzzPOFjCkVtjL5DwWbDf_7AK8
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=grocify-productdashboard.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=grocify-productdashboard
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=grocify-productdashboard.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=838444009982
+NEXT_PUBLIC_FIREBASE_APP_ID=1:838444009982:web:558fa63cc21faa63cc21faa5a6fd8af
+Running the Project
+bash
+Copy code
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Open http://localhost:3000 in your browser.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+How to Add a Product
+Login using demo credentials.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Go to Products page via sidebar.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Click Add Product button.
 
-## Learn More
+Fill the form:
 
-To learn more about Next.js, take a look at the following resources:
+Name (required)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Price (required)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Category (required)
 
-## Deploy on Vercel
+Status (Active / Disabled)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Click Add → product appears instantly in the table.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+How to Edit/Delete/Change Status
+Edit: Click the pencil icon → update form → click Update.
+
+Delete: Click trash icon → confirm → removes from Firestore.
+
+Change Status: Click toggle → Active ↔ Inactive.
+
+Image Upload Notes
+All images are uploaded directly to Firebase Storage.
+Only image files supported (jpg, png).
+Maximum recommended size: 2–3MB.
+
+Analytics Page
+Displays total products.
+
+Active vs Inactive Products (Pie Chart)
+
+Products by Category (Bar Chart)
+
+Real-time updates from Firestore.
+
+Responsive and dark mode friendly.
+
+Styling
+Tailwind CSS with dark/light gradient backgrounds.
+
+ShadCN UI for buttons, modals, inputs, tables.
+
+Fully responsive across all devices.
+
+Dependencies
+next – Next.js 13
+
+react – React 18
+
+firebase – Firestore & Storage
+
+@tanstack/react-table – Product table
+
+framer-motion – Animations
+
+react-hook-form – Form validation
+
+lucide-react – Icons
+
+tailwindcss – Styling
+
+shadcn/ui – UI components
