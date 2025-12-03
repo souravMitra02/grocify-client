@@ -92,7 +92,7 @@ Copy code
 npm run dev
 # or
 yarn dev
-Open http://localhost:3000 in your browser.
+Open https://grocify-srote-new.netlify.app/ in your browser.
 
 How to Add a Product
 Login using demo credentials.
