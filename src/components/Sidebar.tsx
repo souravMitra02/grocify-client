@@ -41,8 +41,8 @@ export default function Sidebar() {
                 key={item.path}
                 href={item.path}
                 className={`block px-4 py-2 rounded-xl transition-all ${path === item.path
-                    ? "bg-green-500 text-white font-semibold shadow-md"
-                    : "text-gray-200 hover:bg-[#1e293b]"
+                  ? "bg-green-500 text-white font-semibold shadow-md"
+                  : "text-gray-200 hover:bg-[#1e293b]"
                   }`}
               >
                 {item.name}

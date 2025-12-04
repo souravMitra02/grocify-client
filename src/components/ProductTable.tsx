@@ -7,17 +7,16 @@ import {
   ColumnDef,
 } from "@tanstack/react-table";
 
+import { Product } from "@/types";
 import { motion } from "framer-motion";
 import { Pencil, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Product } from "@/types";
-import { useEffect, useState } from "react";
 
 interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
-  onDelete: (id: string) => Promise<void>;
-  onChangeStatus: (product: Product) => Promise<void>;
+  onDelete: (id: string) => void;
+  onChangeStatus: (product: Product) => void;
 }
 
 export default function ProductTable({
@@ -26,21 +25,16 @@ export default function ProductTable({
   onDelete,
   onChangeStatus,
 }: ProductTableProps) {
-  const [loading, setLoading] = useState(true);
-
- 
-  useEffect(() => {
-    setLoading(false);
-  }, [products]);
-
   const columns: ColumnDef<Product>[] = [
     { header: "Category", accessorKey: "category" },
     { header: "Name", accessorKey: "name" },
+
     {
       header: "Price",
       accessorKey: "price",
       cell: ({ row }) => `$ ${row.original.price}`,
     },
+
     {
       header: "Status",
       accessorKey: "status",
@@ -56,16 +50,20 @@ export default function ProductTable({
         </span>
       ),
     },
+
     {
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-2 items-center">
+          {/* Edit */}
           <button
             onClick={() => onEdit(row.original)}
             className="flex items-center gap-1 p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/40 shadow text-blue-700 text-sm"
           >
             <Pencil size={16} /> Edit
           </button>
+
+          {/* Status Toggle */}
           <button
             onClick={() => onChangeStatus(row.original)}
             className="flex items-center gap-1 p-2 rounded-lg bg-yellow-400/20 hover:bg-yellow-400/40 shadow text-yellow-800 text-sm"
@@ -77,6 +75,8 @@ export default function ProductTable({
             )}
             {row.original.status === "active" ? "Active" : "Inactive"}
           </button>
+
+          {/* Delete */}
           <button
             onClick={() => onDelete(row.original.id)}
             className="flex items-center gap-1 p-2 rounded-lg bg-red-500/20 hover:bg-red-500/40 shadow text-red-700 text-sm"
@@ -93,6 +93,8 @@ export default function ProductTable({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const loading = products.length === 0;
 
   return (
     <motion.div
@@ -128,6 +130,7 @@ export default function ProductTable({
                   </tr>
                 ))}
               </thead>
+
               <tbody>
                 {table.getRowModel().rows.map((row, i) => (
                   <motion.tr
@@ -147,13 +150,6 @@ export default function ProductTable({
                     ))}
                   </motion.tr>
                 ))}
-                {products.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="text-center py-5 text-gray-400">
-                      No products found
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>

@@ -28,7 +28,7 @@ export default function ProductsPage() {
         const data = await res.json();
 
         if (!res.ok || !data.authenticated) {
-          router.push("/login"); 
+          router.push("/login");
         } else {
           setAuthChecked(true);
         }

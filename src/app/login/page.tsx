@@ -74,6 +74,8 @@ export default function LoginPage() {
             src={banner}
             alt="Login Banner"
             fill
+            sizes="100vw"
+
             className="object-cover"
             priority
           />
