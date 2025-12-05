@@ -35,12 +35,15 @@ export default function LoginPage() {
     setLoginError("");
 
     try {
-      const res = await fetch("https://grocify-server-production.up.railway.app/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        "https://grocify-server-production.up.railway.app/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(data),
+        }
+      );
 
       const result = await res.json();
       if (!res.ok) {
@@ -48,9 +51,26 @@ export default function LoginPage() {
         return;
       }
 
-      dispatch(loginSuccess(data.email));
-      router.push("/dashboard/products");
-    } catch {
+
+      const checkRes = await fetch(
+        "https://grocify-server-production.up.railway.app/api/auth/check",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const checkData = await checkRes.json();
+      if (checkRes.ok && checkData.authenticated) {
+        // Dispatch Redux login success
+        dispatch(loginSuccess(data.email));
+        // Redirect to dashboard
+        router.push("/dashboard/products");
+      } else {
+        setLoginError("Login failed. Try again.");
+      }
+    } catch (err) {
+      console.error(err);
       setLoginError("Something went wrong! Try again.");
     } finally {
       setLoading(false);
@@ -59,7 +79,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-500 via-lime-500 to-emerald-600 flex items-center justify-center p-4">
-
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -68,22 +87,20 @@ export default function LoginPage() {
                flex flex-col md:flex-row border border-white/40"
       >
 
-
+        {/* Left banner */}
         <div className="hidden md:block md:w-1/2 aspect-[4/3] md:aspect-auto relative">
           <Image
             src={banner}
             alt="Login Banner"
             fill
             sizes="100vw"
-
             className="object-cover"
             priority
           />
         </div>
 
-
+        {/* Right form */}
         <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-center">
-
           <div className="flex justify-center mb-3">
             <Image
               src={logo}
@@ -111,6 +128,7 @@ export default function LoginPage() {
               {loginError}
             </motion.p>
           )}
+
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label className="text-gray-700 text-sm">Email <span className="text-red-500">*</span></label>
@@ -124,6 +142,7 @@ export default function LoginPage() {
               </div>
               {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
             </div>
+
             <div>
               <label className="text-gray-700 text-sm">Password <span className="text-red-500">*</span></label>
               <div className="relative bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus-within:border-green-500">
@@ -133,7 +152,6 @@ export default function LoginPage() {
                   className="bg-transparent border-none focus-visible:ring-0 px-0 h-8"
                   {...register("password", { required: "Password is required" })}
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
@@ -144,11 +162,11 @@ export default function LoginPage() {
               </div>
               {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
             </div>
+
             <Button
               disabled={loading}
               type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 py-2.5 rounded-lg 
-                     text-white font-semibold shadow-md text-sm"
+              className="w-full bg-green-600 hover:bg-green-700 py-2.5 rounded-lg text-white font-semibold shadow-md text-sm"
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
@@ -157,12 +175,8 @@ export default function LoginPage() {
           <p className="text-center text-gray-500 text-xs mt-4">
             Demo: admin@demo.com / 123456
           </p>
-
         </div>
-
       </motion.div>
     </div>
-
   );
-
 }
