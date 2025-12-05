@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState} from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -8,14 +8,13 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { useAppDispatch } from "@/redux/hooks";
 import { loginSuccess } from "@/redux/authSlice";
-
+import { redirect, RedirectType } from 'next/navigation'
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import Image from "next/image";
 import banner from "../../../public/login-image2.png";
-import logo from "../../../public/logo-image.png";
-
+import logo from "../../../public/logo-image.png"; 
 interface LoginForm {
   email: string;
   password: string;
@@ -25,7 +24,7 @@ export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
   const router = useRouter();
   const dispatch = useAppDispatch();
-
+  // const navigate = useNavigate()
   const [loginError, setLoginError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -49,7 +48,7 @@ export default function LoginPage() {
       }
 
       dispatch(loginSuccess(data.email));
-      router.push("/dashboard/products");
+      redirect('/dashboard/products', RedirectType.push)
     } catch {
       setLoginError("Something went wrong! Try again.");
     } finally {
