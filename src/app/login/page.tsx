@@ -23,7 +23,6 @@ interface LoginForm {
 
 export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
-  const router = useRouter();
   const dispatch = useAppDispatch();
 
   const [loginError, setLoginError] = useState("");
