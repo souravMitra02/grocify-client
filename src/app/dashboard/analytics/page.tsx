@@ -21,7 +21,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("https://grocify-server-zeta.vercel.app/api/auth/check", {
+        const res = await fetch("https://grocify-server-production.up.railway.app/api/auth/check", {
           method: "GET",
           credentials: "include",
         });

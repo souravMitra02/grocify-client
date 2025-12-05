@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://grocify-server-zeta.vercel.app/api/auth",
+    baseUrl: "https://grocify-server-production.up.railway.app/api/auth",
     credentials: "include",
   }),
   endpoints: (builder) => ({

@@ -35,7 +35,7 @@ export default function LoginPage() {
     setLoginError("");
 
     try {
-      const res = await fetch("https://grocify-server-zeta.vercel.app/api/auth/login", {
+      const res = await fetch("https://grocify-server-production.up.railway.app/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

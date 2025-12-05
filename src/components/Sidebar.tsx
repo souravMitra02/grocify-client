@@ -14,7 +14,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      await fetch("https://grocify-server-zeta.vercel.app/api/auth/logout", {
+      await fetch("https://grocify-server-production.up.railway.app/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
