@@ -1,12 +1,10 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { db, collection, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from "@/lib/firebase";
 import ProductTable from "@/components/ProductTable";
 import ProductModal from "@/components/ProductModal";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function ProductsPage() {
@@ -16,25 +14,31 @@ export default function ProductsPage() {
   const [editProduct, setEditProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
-
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("https://grocify-server-production.up.railway.app/api/auth/check", {
-          method: "GET",
-          credentials: "include",
-
-        });
+        const res = await fetch(
+          "https://grocify-server-production.up.railway.app/api/auth/check",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        if (!res.ok) {
+          router.push("/login");
+          return;
+        }
 
         const data = await res.json();
 
-        if (!res.ok || !data.authenticated) {
+        if (!data.authenticated) {
           router.push("/login");
-        } else {
-          setAuthChecked(true);
+          return;
         }
+
+        setAuthChecked(true);
       } catch (err) {
-        console.error(err);
+        console.error("Auth check failed:", err);
         router.push("/login");
       }
     };
