@@ -23,6 +23,7 @@ interface LoginForm {
 
 export default function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
+  const router = useRouter();
   const dispatch = useAppDispatch();
 
   const [loginError, setLoginError] = useState("");
@@ -48,7 +49,7 @@ export default function LoginPage() {
       }
 
       dispatch(loginSuccess(data.email));
-    window.location.replace("/dashboard/products");
+      router.push("/dashboard/products");
     } catch {
       setLoginError("Something went wrong! Try again.");
     } finally {
