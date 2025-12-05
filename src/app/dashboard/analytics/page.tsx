@@ -3,14 +3,23 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { db, collection, onSnapshot } from "@/lib/firebase";
-import ChartCard from "@/components/ChartCard";
+import { authHelper } from "@/lib/auth";
 
+import ChartCard from "@/components/ChartCard";
 import {
-  PieChart, Pie, Cell,
-  BarChart, Bar, XAxis, YAxis,
-  Tooltip, ResponsiveContainer
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import { Spinner } from "@/components/ui/spinner";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://grocify-server-production.up.railway.app";
 
 export default function AnalyticsPage() {
   const router = useRouter();
@@ -21,24 +30,25 @@ export default function AnalyticsPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("https://grocify-server-production.up.railway.app/api/auth/check", {
+        const res = await fetch(`${API_URL}/api/auth/check`, {
           method: "GET",
           credentials: "include",
+          headers: authHelper.getAuthHeaders(),
         });
 
         if (!res.ok) {
-          router.push("/login");
-          return;
+          throw new Error("Authentication failed");
         }
 
         const data = await res.json();
         if (!data.authenticated) {
-          router.push("/login");
-        } else {
-          setAuthChecked(true);
+          throw new Error("Not authenticated");
         }
+
+        setAuthChecked(true);
       } catch (err) {
-        console.error(err);
+        console.error("Auth check failed:", err);
+        authHelper.removeToken();
         router.push("/login");
       }
     };
@@ -49,10 +59,19 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!authChecked) return;
 
-    const unsubscribe = onSnapshot(collection(db, "products"), snapshot => {
-      setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      setLoading(false);
-    });
+    const unsubscribe = onSnapshot(
+      collection(db, "products"),
+      (snapshot) => {
+        setProducts(
+          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Firestore error:", error);
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, [authChecked]);
@@ -60,7 +79,7 @@ export default function AnalyticsPage() {
   if (!authChecked || loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-        <Spinner className="size-16 text-blue-500" />
+        <Spinner className="size-16 text-green-500" />
       </div>
     );
   }
@@ -68,8 +87,14 @@ export default function AnalyticsPage() {
   const totalProducts = products.length;
 
   const statusData = [
-    { name: "Active", value: products.filter(p => p.status === "active").length },
-    { name: "Inactive", value: products.filter(p => p.status !== "active").length },
+    {
+      name: "Active",
+      value: products.filter((p) => p.status === "active").length,
+    },
+    {
+      name: "Inactive",
+      value: products.filter((p) => p.status !== "active").length,
+    },
   ];
 
   const COLORS = ["#22c55e", "#ef4444"];
@@ -79,24 +104,26 @@ export default function AnalyticsPage() {
     return acc;
   }, {});
 
-  const categoryData = Object.keys(categoryCount).map(key => ({
+  const categoryData = Object.keys(categoryCount).map((key) => ({
     name: key,
     value: categoryCount[key],
   }));
 
   return (
     <div className="p-6 space-y-8 min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-bold text-green-400 tracking-wide">
-        Grocery Products Analytics
+      <h1 className="text-3xl font-bold text-gray-800 tracking-wide">
+        Analytics Dashboard
       </h1>
 
       <div className="grid md:grid-cols-2 gap-6">
         <ChartCard title="Total Products">
-          <p className="text-4xl font-semibold text-white">{totalProducts}</p>
-          <p className="text-gray-400 mt-1 text-sm">All grocery items in the database</p>
+          <p className="text-4xl font-semibold text-gray-800">{totalProducts}</p>
+          <p className="text-gray-500 mt-1 text-sm">
+            All items in inventory
+          </p>
         </ChartCard>
 
-        <ChartCard title="Active vs Inactive Products">
+        <ChartCard title="Active vs Inactive">
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -104,12 +131,13 @@ export default function AnalyticsPage() {
                 dataKey="value"
                 nameKey="name"
                 outerRadius={70}
+                label
               >
                 {statusData.map((entry, index) => (
                   <Cell key={index} fill={COLORS[index]} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ background: "#1e293b", borderRadius: 8 }} />
+              <Tooltip />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -117,10 +145,10 @@ export default function AnalyticsPage() {
         <ChartCard title="Products by Category">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={categoryData}>
-              <XAxis dataKey="name" stroke="#ccc" />
-              <YAxis stroke="#ccc" />
-              <Tooltip contentStyle={{ background: "#1e293b", borderRadius: 8 }} />
-              <Bar dataKey="value" fill="#22c55e" radius={[6, 6, 0, 0]} />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="value" fill="#22c55e" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

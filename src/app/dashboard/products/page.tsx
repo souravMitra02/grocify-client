@@ -1,11 +1,24 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { db, collection, onSnapshot, addDoc, updateDoc, doc, deleteDoc } from "@/lib/firebase";
+import {
+  db,
+  collection,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  doc,
+  deleteDoc,
+} from "@/lib/firebase";
+import { authHelper } from "@/lib/auth";
+
 import ProductTable from "@/components/ProductTable";
 import ProductModal from "@/components/ProductModal";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://grocify-server-production.up.railway.app";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -14,50 +27,56 @@ export default function ProductsPage() {
   const [editProduct, setEditProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch(
-          "https://grocify-server-production.up.railway.app/api/auth/check",
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const res = await fetch(`${API_URL}/api/auth/check`, {
+          method: "GET",
+          credentials: "include",
+          headers: authHelper.getAuthHeaders(),
+        });
+
         if (!res.ok) {
-          router.push("/login");
-          return;
+          throw new Error("Authentication failed");
         }
 
         const data = await res.json();
 
         if (!data.authenticated) {
-          router.push("/login");
-          return;
+          throw new Error("Not authenticated");
         }
 
         setAuthChecked(true);
       } catch (err) {
         console.error("Auth check failed:", err);
+        authHelper.removeToken();
         router.push("/login");
       }
     };
 
     checkAuth();
   }, [router]);
-
   useEffect(() => {
     if (!authChecked) return;
 
     const productsCollection = collection(db, "products");
-    const unsubscribe = onSnapshot(productsCollection, (snapshot) => {
-      const productsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setProducts(productsData);
-      setLoading(false);
-    });
+    
+    const unsubscribe = onSnapshot(
+      productsCollection,
+      (snapshot) => {
+        const productsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProducts(productsData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Firestore error:", error);
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, [authChecked]);
@@ -74,28 +93,43 @@ export default function ProductsPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      await deleteDoc(doc(db, "products", id));
+      try {
+        await deleteDoc(doc(db, "products", id));
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert("Failed to delete product");
+      }
     }
   };
 
   const handleChangeStatus = async (product: any) => {
-    const newStatus = product.status === "active" ? "inactive" : "active";
-    await updateDoc(doc(db, "products", product.id), { status: newStatus });
+    try {
+      const newStatus = product.status === "active" ? "inactive" : "active";
+      await updateDoc(doc(db, "products", product.id), { status: newStatus });
+    } catch (error) {
+      console.error("Error changing status:", error);
+      alert("Failed to change status");
+    }
   };
 
   const handleSave = async (product: any) => {
-    if (editProduct) {
-      await updateDoc(doc(db, "products", editProduct.id), product);
-    } else {
-      await addDoc(collection(db, "products"), product);
+    try {
+      if (editProduct) {
+        await updateDoc(doc(db, "products", editProduct.id), product);
+      } else {
+        await addDoc(collection(db, "products"), product);
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error saving product:", error);
+      alert("Failed to save product");
     }
-    setIsModalOpen(false);
   };
 
   if (!authChecked || loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-        <Spinner className="size-16 text-blue-500" />
+        <Spinner className="size-16 text-green-500" />
       </div>
     );
   }
@@ -106,7 +140,10 @@ export default function ProductsPage() {
         <h1 className="text-3xl font-extrabold text-gray-800 mb-3 md:mb-0">
           Product Management
         </h1>
-        <Button onClick={handleAdd} className="bg-green-600 hover:bg-green-700 text-white">
+        <Button
+          onClick={handleAdd}
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
           Add Product
         </Button>
       </div>
