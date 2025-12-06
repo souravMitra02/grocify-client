@@ -34,7 +34,9 @@ export default function ProductsPage() {
         const res = await fetch(`${API_URL}/api/auth/check`, {
           method: "GET",
           credentials: "include",
-          headers: authHelper.getAuthHeaders(),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
 
         if (!res.ok) {
@@ -50,13 +52,14 @@ export default function ProductsPage() {
         setAuthChecked(true);
       } catch (err) {
         console.error("Auth check failed:", err);
-        authHelper.removeToken();
+        authHelper.clearLoginState();
         router.push("/login");
       }
     };
 
     checkAuth();
   }, [router]);
+
   useEffect(() => {
     if (!authChecked) return;
 

@@ -58,7 +58,7 @@ export default function LoginPage() {
         setLoginError(result?.message || "Invalid credentials");
         return;
       }
-      if (result.token) authHelper.setToken(result.token);
+      authHelper.setLoginState(true);
 
       // Update Redux state
       dispatch(loginSuccess(data.email));

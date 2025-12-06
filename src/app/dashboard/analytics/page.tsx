@@ -32,7 +32,7 @@ export default function AnalyticsPage() {
       try {
         const res = await fetch(`${API_URL}/api/auth/check`, {
           method: "GET",
-          credentials: "include",
+          credentials: "include", // CRITICAL: Send cookies
           headers: authHelper.getAuthHeaders(),
         });
 
@@ -48,7 +48,7 @@ export default function AnalyticsPage() {
         setAuthChecked(true);
       } catch (err) {
         console.error("Auth check failed:", err);
-        authHelper.removeToken();
+        authHelper.clearLoginState();
         router.push("/login");
       }
     };
