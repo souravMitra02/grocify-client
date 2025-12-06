@@ -22,7 +22,9 @@ interface LoginForm {
   password: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://grocify-server-production.up.railway.app";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://grocify-server-production.up.railway.app";
 
 export default function LoginPage() {
   const {
@@ -30,7 +32,7 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>();
-  
+
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -46,7 +48,7 @@ export default function LoginPage() {
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // Include cookies
+        credentials: "include",
         body: JSON.stringify(data),
       });
 
@@ -56,19 +58,15 @@ export default function LoginPage() {
         setLoginError(result?.message || "Invalid credentials");
         return;
       }
-
-      // Store token for cross-origin requests
-      if (result.token) {
-        authHelper.setToken(result.token);
-      }
+      if (result.token) authHelper.setToken(result.token);
 
       // Update Redux state
       dispatch(loginSuccess(data.email));
 
-      // Redirect to dashboard
+      // Redirect to products dashboard
       router.push("/dashboard/products");
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (err) {
+      console.error("Login error:", err);
       setLoginError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -81,10 +79,9 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-4xl bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden 
-               flex flex-col md:flex-row border border-white/40"
+        className="w-full max-w-4xl bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row border border-white/40"
       >
-        {/* Banner Image */}
+        {/* Banner */}
         <div className="hidden md:block md:w-1/2 aspect-[4/3] md:aspect-auto relative">
           <Image
             src={banner}
@@ -96,7 +93,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Login Form */}
+        {/* Form */}
         <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-center">
           <div className="flex justify-center mb-3">
             <Image
@@ -140,7 +137,9 @@ export default function LoginPage() {
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -153,7 +152,9 @@ export default function LoginPage() {
                   type={showPass ? "text" : "password"}
                   placeholder="123456"
                   className="bg-transparent border-none focus-visible:ring-0 px-0 h-8"
-                  {...register("password", { required: "Password is required" })}
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
                 />
                 <button
                   type="button"
@@ -173,8 +174,7 @@ export default function LoginPage() {
             <Button
               disabled={loading}
               type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 py-2.5 rounded-lg 
-                     text-white font-semibold shadow-md text-sm"
+              className="w-full bg-green-600 hover:bg-green-700 py-2.5 rounded-lg text-white font-semibold shadow-md text-sm"
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
